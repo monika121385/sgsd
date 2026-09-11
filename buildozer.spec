@@ -13,7 +13,6 @@ source.include_exts = py
 
 # (str) 应用版本
 version = 0.1
-version.regex = __version__ = ['"](.*)['"]
 
 # (list) 依赖：python3 + kivy + requests
 requirements = python3,kivy,requests
