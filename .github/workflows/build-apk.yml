@@ -1,0 +1,32 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - name: 拉取代码
+        uses: actions/checkout@v4
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: 安装 JDK 17 与编译依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jdk unzip git zip build-essential \
+            autoconf automake libtool pkg-config
+          echo "JAVA_HOME=$(dirname $(dirname $(readlink -f $(which java))))" >> "$GITHUB_ENV"
+      - name: 安装 Buildozer
+        run: pip install --upgrade buildozer
+      - name: 构建 APK（首次下载 SDK/NDK 约 20~40 分钟）
+        run: buildozer android debug
+      - name: 上传 APK 产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: accountquery-apk
+          path: bin/*.apk
+          if-no-files-found: error
